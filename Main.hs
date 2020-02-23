@@ -100,10 +100,9 @@ fromListWith combine l = do
    where
     go' []              = return ht
     go' ((!k, !v) : xs) = do
-      old_v <- HC.lookup ht k
-      case old_v of
-        Nothing -> HC.insert ht k v
-        Just v' -> HC.insert ht k (combine v' v)
+      HC.mutate ht k (\mv -> case mv of
+        Just old_v -> (Just $ combine old_v v, ())
+        Nothing -> (Just v, ()))
       go' xs
 {-# INLINE fromListWith #-}
 
